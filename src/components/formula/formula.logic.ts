@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { useQuery } from 'react-query';
 import { FilterOptionsState } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
+import { compile } from 'mathjs';
 
 type Store = {
    formulaName: string;
@@ -21,6 +22,8 @@ type Store = {
    setArgFormatInputVal: (val: string) => void;
    argFormatInputValId: string;
    setArgFormatInputValId: (valId: string) => void;
+   result: string;
+   setResult: (res: string) => void;
 };
 
 export type FormulaArg = {
@@ -50,6 +53,8 @@ export const useStore = create<Store>()((set) => ({
    argFormatInputValId: '',
    setArgFormatInputVal: (val: string) => set(() => ({ argFormatInputVal: val })),
    setArgFormatInputValId: (valId: string) => set(() => ({ argFormatInputValId: valId })),
+   result: '0',
+   setResult: (res: string) => set(() => ({ result: res })),
 }));
 
 const useFormulaLogic = () => {
@@ -70,6 +75,8 @@ const useFormulaLogic = () => {
    const setArgFormatInputVal = useStore((state) => state.setArgFormatInputVal);
    const argFormatInputValId = useStore((state) => state.argFormatInputValId);
    const setArgFormatInputValId = useStore((state) => state.setArgFormatInputValId);
+   const result = useStore((state) => state.result);
+   const setResult = useStore((state) => state.setResult);
 
    const handleFormulaNameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       setFormulaName(event.target.value);
@@ -104,7 +111,10 @@ const useFormulaLogic = () => {
    ) => {
       const charWithoutOperand = inputValue.match(charsExceptOperandsRegExp);
       const filterValue = charWithoutOperand ? charWithoutOperand[0].trim() : inputValue;
-      return options.filter((option) => option.name.includes(filterValue));
+      return options.filter(
+         (option) =>
+            option.name.includes(filterValue) && !autocompleteValue.find((val) => val.id === option.id),
+      );
    };
 
    const makeOperandFormulaArg = (operand: string): FormulaArg => ({
@@ -129,6 +139,20 @@ const useFormulaLogic = () => {
       setAutocompleteValue([...prevValues, ...operandsAsFormulaArg, updatedLastVal]);
    };
 
+   const handleCalcRes = () => {
+      const expressionPartials = autocompleteValue.map((autocompleteValue) =>
+         autocompleteValue.value.toString(),
+      );
+      const expression = expressionPartials.join('');
+      try {
+         const compiled = compile(expression);
+         const result = compiled.evaluate();
+         setResult(result?.toString() ?? 0);
+      } catch {
+         setResult('ERR');
+      }
+   };
+
    return {
       data: {
          inputOpen,
@@ -140,6 +164,7 @@ const useFormulaLogic = () => {
          argFormatValInputOpen,
          argFormatInputVal,
          argFormatInputValId,
+         result,
       },
       handlers: {
          toggleInput,
@@ -154,6 +179,7 @@ const useFormulaLogic = () => {
          setArgFormatValInputOpen,
          setArgFormatInputVal,
          setArgFormatInputValId,
+         handleCalcRes,
       },
    };
 };

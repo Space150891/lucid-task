@@ -32,6 +32,8 @@ const useFormulaStyles = () => {
    };
 
    const inputBoxSx: SxProps = {
+      display: 'flex',
+      flexDirection: 'column',
       padding: '8px 16px',
       backgroundColor: '#ffffff',
    };
@@ -44,6 +46,10 @@ const useFormulaStyles = () => {
       cursor: 'pointer',
    };
 
+   const calcButtonSx: SxProps = {
+      marginTop: '16px',
+   };
+
    return {
       containerBoxSx,
       wrapperBoxSx,
@@ -52,6 +58,7 @@ const useFormulaStyles = () => {
       inputBoxSx,
       iconButtonSx,
       formulaNameTypographySx,
+      calcButtonSx,
    };
 };
 

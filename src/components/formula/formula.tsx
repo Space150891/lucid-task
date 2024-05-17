@@ -1,4 +1,4 @@
-import { Box, IconButton, Typography, Collapse, TextField, Autocomplete, Chip } from '@mui/material';
+import { Box, IconButton, Typography, Collapse, TextField, Autocomplete, Chip, Button } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 // import { v4 as uuidv4 } from 'uuid';
 import useFormulaStyles from './formula.styles';
@@ -36,7 +36,7 @@ function Formula() {
             </Box>
 
             <Box sx={sx.contentBoxSx}>
-               <Typography>0</Typography>
+               <Typography>{data.result}</Typography>
             </Box>
 
             <Collapse in={data.inputOpen} timeout='auto'>
@@ -119,6 +119,10 @@ function Formula() {
                         })
                      }
                   />
+
+                  <Button sx={sx.calcButtonSx} onClick={handlers.handleCalcRes}>
+                     Calc
+                  </Button>
                </Box>
             </Collapse>
          </Box>
